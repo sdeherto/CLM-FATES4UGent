@@ -2,7 +2,7 @@
 # =======================================================================================
 # =======================================================================================
 export CIME_MODEL=cesm
-export COMPSET=I2000Clm50Fates 
+export COMPSET=I2000Clm50Fates
 export RES=CLM_USRDAT                                
 export MACH=hydra                                             # Name your machine
 export COMPILER=gnu                                            # Name your compiler
@@ -10,15 +10,18 @@ export SITE=bci                                                # Name your site
 
 export TAG=fates-tutorial-${SITE}-inventory_init  # give your run a name
 export CASE_ROOT=$VSC_SCRATCH/cesm/cases/                  # where in scratch should the run go?
-export PARAM_FILES=$VSC_SCATCH/cesm/params                    # FATES parameter file location
+export PARAM_FILES=$VSC_SCRATCH/cesm/params                    # FATES parameter file location
 
 # surface and domain files
 export SITE_BASE_DIR=$VSC_SCRATCH/cesm/sitedata
-export ELM_USRDAT_DOMAIN=domain_${SITE}_fates_tutorial.nc
-export ELM_USRDAT_SURDAT=surfdata_${SITE}_fates_tutorial.nc
-export ELM_SURFDAT_DIR=${SITE_BASE_DIR}/${SITE}
-export ELM_DOMAIN_DIR=${SITE_BASE_DIR}/${SITE}
+export CLM_USRDAT_DOMAIN=domain_${SITE}_fates_tutorial.nc
+export CLM_USRDAT_SURDAT=surfdata_${SITE}_fates_tutorial.nc
+export CLM_USRDAT_MESH=domain_${SITE}_fates_mesh.nc
+export CLM_SURFDAT_DIR=${SITE_BASE_DIR}/${SITE}
+export CLM_DOMAIN_DIR=${SITE_BASE_DIR}/${SITE}
+export CLM_MESH_DIR=${SITE_BASE_DIR}/${SITE}
 export DIN_LOC_ROOT_FORCE=${SITE_BASE_DIR}
+
 
 # climate data will recycle data between these years 
 export DATM_START=2003
@@ -43,50 +46,17 @@ cd ${CASE_NAME}
 # SET PATHS TO SCRATCH ROOT, DOMAIN AND MET DATA (USERS WILL PROB NOT CHANGE THESE)
 # =================================================================================
 
-./xmlchange LND_DOMAIN_FILE=${ELM_USRDAT_DOMAIN}
-./xmlchange LND_DOMAIN_PATH=${ELM_DOMAIN_DIR}
+./xmlchange ATM_DOMAIN_MESH=${CLM_MESH_DIR}/${CLM_USRDAT_MESH}
+./xmlchange LND_DOMAIN_FILE=${CLM_USRDAT_DOMAIN}
+./xmlchange LND_DOMAIN_PATH=${CLM_DOMAIN_DIR}
 ./xmlchange DATM_MODE=1PT
 ./xmlchange DIN_LOC_ROOT_CLMFORC=${DIN_LOC_ROOT_FORCE}
-./xmlchange CIME_OUTPUT_ROOT=${CASE_NAME}
-
-./xmlchange PIO_VERSION=2
+./xmlchange CLM_USRDAT_NAME=${SITE}
 
 # For constant CO2
 ./xmlchange CCSM_CO2_PPMV=412
 ./xmlchange DATM_CO2_TSERIES=none
 ./xmlchange CLM_CO2_TYPE=constant
-
-
-# SPECIFY PE LAYOUT FOR SINGLE SITE RUN (USERS WILL PROB NOT CHANGE THESE)
-# =================================================================================
-
-./xmlchange NTASKS_ATM=1
-./xmlchange NTASKS_CPL=1
-./xmlchange NTASKS_GLC=1
-./xmlchange NTASKS_OCN=1
-./xmlchange NTASKS_WAV=1
-./xmlchange NTASKS_ICE=1
-./xmlchange NTASKS_LND=1
-./xmlchange NTASKS_ROF=1
-./xmlchange NTASKS_ESP=1
-./xmlchange ROOTPE_ATM=0
-./xmlchange ROOTPE_CPL=0
-./xmlchange ROOTPE_GLC=0
-./xmlchange ROOTPE_OCN=0
-./xmlchange ROOTPE_WAV=0
-./xmlchange ROOTPE_ICE=0
-./xmlchange ROOTPE_LND=0
-./xmlchange ROOTPE_ROF=0
-./xmlchange ROOTPE_ESP=0
-./xmlchange NTHRDS_ATM=1
-./xmlchange NTHRDS_CPL=1
-./xmlchange NTHRDS_GLC=1
-./xmlchange NTHRDS_OCN=1
-./xmlchange NTHRDS_WAV=1
-./xmlchange NTHRDS_ICE=1
-./xmlchange NTHRDS_LND=1
-./xmlchange NTHRDS_ROF=1
-./xmlchange NTHRDS_ESP=1
 
 # SPECIFY RUN TYPE PREFERENCES (USERS WILL CHANGE THESE)
 # =================================================================================
@@ -98,22 +68,17 @@ cd ${CASE_NAME}
 ./xmlchange REST_N=10                        # how often to make restart files
 ./xmlchange RESUBMIT=0                       # how many resubmits (only important for very long runs) 
 
-./xmlchange DATM_YR_START=${DATM_START}  # are defined at start of script
-./xmlchange DATM_YR_END=${DATM_STOP}
+./xmlchange DATM_YR_START=${DATM_START}
+./xmlchange DATM_YR_END=${DATM_STOP}    # are defined at start of script
 
 
 # MACHINE SPECIFIC, AND/OR USER PREFERENCE CHANGES (USERS WILL CHANGE THESE)
 # =================================================================================
 
-./xmlchange GMAKE=make
-./xmlchange RUNDIR=${CASE_NAME}/run
-./xmlchange EXEROOT=${CASE_NAME}/bld
-
-
 # point to your parameter file
 # add any history variables you want 
 cat >> user_nl_clm <<EOF
-fsurdat = '${ELM_SURFDAT_DIR}/${ELM_USRDAT_SURDAT}'
+fsurdat = '${CLM_SURFDAT_DIR}/${CLM_USRDAT_SURDAT}'
 fates_paramfile='${PARAM_FILES}/fates_params_default-1pft.nc'
 use_fates=.true.
 use_fates_planthydro=.false.
@@ -139,12 +104,12 @@ hist_fincl1=
 EOF
 
 # Setup case
-./case.setup
+./case.setup 
 ./preview_namelists
 
 # Make change to datm stream field info variable names (specific for this tutorial) - DO NOT CHANGE
-cp run/datm.streams.txt.CLM1PT.ELM_USRDAT user_datm.streams.txt.CLM1PT.ELM_USRDAT
-`sed -i '/FLDS/d' user_datm.streams.txt.CLM1PT.ELM_USRDAT` 
+cp $VSC_SCRATCH/cesm/output/${TAG}.`date +"%Y-%m-%d"`/run/datm.streams.txt.CLM1PT.CLM_USRDAT user_datm.streams.txt.CLM1PT.CLM_USRDAT
+`sed -i '/FLDS/d' user_datm.streams.txt.CLM1PT.CLM_USRDAT` 
 
 # Build and submit the case
 ./case.build --skip-provenance-check # skipping provenance avoids calling git (for this tutorial only)

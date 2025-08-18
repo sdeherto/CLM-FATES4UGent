@@ -1,0 +1,10 @@
+
+# Change below line if you move the subset data directory
+
+./xmlchange CLM_USRDAT_DIR=/scratch/brussel/vo/000/bvo00003/vsc46573/cesm/sitedata/bci_jra
+
+./xmlchange PTS_LON=280.2
+
+./xmlchange PTS_LAT=9.15
+
+./xmlchange MPILIB=mpi-serial
