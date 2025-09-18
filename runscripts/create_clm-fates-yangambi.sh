@@ -2,28 +2,30 @@
 # =======================================================================================
 # =======================================================================================
 export CIME_MODEL=cesm
-export COMPSET=I2000Clm50FatesRs
+export COMPSET=I2000Clm50Fates
 export RES=CLM_USRDAT                                
 export MACH=hydra                                             # Name your machine
 export COMPILER=gnu                                            # Name your compiler
-export SITE=bci                                                # Name your site
+export SITE=yangambi_jra                                                # Name your site
 
-export TAG=fates-tutorial-${SITE}-inventory_init  # give your run a name
+export TAG=fates-tutorial-${SITE}  # give your run a name
 export CASE_ROOT=$VSC_SCRATCH/cesm/cases/                  # where in scratch should the run go?
 export PARAM_FILES=$VSC_SCRATCH/cesm/params                    # FATES parameter file location
 
 # surface and domain files
 export SITE_BASE_DIR=$VSC_SCRATCH/cesm/sitedata
-export CLM_USRDAT_DOMAIN=domain_${SITE}_fates_tutorial.nc
-export CLM_USRDAT_SURDAT=surfdata_${SITE}_fates_tutorial.nc
+export CLM_USRDAT_DOMAIN=domain.lnd.fv0.9x1.25_gx1v7_${SITE}_c250826.nc
+export CLM_USRDAT_SURDAT=surfdata_${SITE}_hist_2000_16pfts_c250826.nc
+export CLM_USRDAT_MESH=domain_${SITE}_fates_mesh.nc
 export CLM_SURFDAT_DIR=${SITE_BASE_DIR}/${SITE}
 export CLM_DOMAIN_DIR=${SITE_BASE_DIR}/${SITE}
+export CLM_MESH_DIR=${SITE_BASE_DIR}/${SITE}
 export DIN_LOC_ROOT_FORCE=${SITE_BASE_DIR}
 
 
 # climate data will recycle data between these years 
 export DATM_START=2003
-export DATM_STOP=2016
+export DATM_STOP=2015
 
 # DEPENDENT PATHS AND VARIABLES (USER MIGHT CHANGE THESE..)
 # =======================================================================================
@@ -36,9 +38,7 @@ export CASE_NAME=${CASE_ROOT}/${TAG}.`date +"%Y-%m-%d"`
 rm -r ${CASE_NAME}
 
 # CREATE THE CASE
-module load CESM-deps/2-foss-2023a
-
-./create_newcase --case=${CASE_NAME} --res=${RES} --compset=${COMPSET} --mach=${MACH} --compiler=${COMPILER} --run-unsupported --driver=mct 
+./create_newcase --case=${CASE_NAME} --res=${RES} --compset=${COMPSET} --mach=${MACH} --compiler=${COMPILER} --run-unsupported 
 
 cd ${CASE_NAME}
 
@@ -46,24 +46,28 @@ cd ${CASE_NAME}
 # SET PATHS TO SCRATCH ROOT, DOMAIN AND MET DATA (USERS WILL PROB NOT CHANGE THESE)
 # =================================================================================
 
-./xmlchange ATM_DOMAIN_FILE=${CLM_USRDAT_DOMAIN}
-./xmlchange ATM_DOMAIN_PATH=${CLM_DOMAIN_DIR}
+./xmlchange --force CLM_USRDAT_DIR=/scratch/brussel/vo/000/bvo00003/vsc46573/cesm/sitedata/${SITE}
+
+./xmlchange --force PTS_LON=24.4
+
+./xmlchange --force PTS_LAT=0.76
+
+#./xmlchange ATM_DOMAIN_MESH=${CLM_MESH_DIR}/${CLM_USRDAT_MESH}
 ./xmlchange LND_DOMAIN_FILE=${CLM_USRDAT_DOMAIN}
 ./xmlchange LND_DOMAIN_PATH=${CLM_DOMAIN_DIR}
-./xmlchange DATM_MODE=CLM1PT
+#./xmlchange DATM_MODE=1PT
 ./xmlchange DIN_LOC_ROOT_CLMFORC=${DIN_LOC_ROOT_FORCE}
 ./xmlchange CLM_USRDAT_NAME=${SITE}
-
-
-#--- Set additional namelists
-export USER_NL_DATM="${CASE_NAME}/user_nl_datm"
-export USER_NL_MOSART="${CASE_NAME}/user_nl_mosart"
-#---~---
 
 # For constant CO2
 ./xmlchange CCSM_CO2_PPMV=412
 ./xmlchange DATM_CO2_TSERIES=none
 ./xmlchange CLM_CO2_TYPE=constant
+
+# SPECIFY PE LAYOUT FOR SINGLE SITE RUN (USERS WILL PROB NOT CHANGE THESE)
+# =================================================================================
+
+./xmlchange NTASKS=1
 
 # SPECIFY RUN TYPE PREFERENCES (USERS WILL CHANGE THESE)
 # =================================================================================
@@ -75,8 +79,8 @@ export USER_NL_MOSART="${CASE_NAME}/user_nl_mosart"
 ./xmlchange REST_N=10                        # how often to make restart files
 ./xmlchange RESUBMIT=0                       # how many resubmits (only important for very long runs) 
 
-./xmlchange DATM_CLMNCEP_YR_START=${DATM_START}
-./xmlchange DATM_CLMNCEP_YR_END=${DATM_STOP}    # are defined at start of script
+./xmlchange DATM_YR_START=${DATM_START}
+./xmlchange DATM_YR_END=${DATM_STOP}    # are defined at start of script
 
 
 # MACHINE SPECIFIC, AND/OR USER PREFERENCE CHANGES (USERS WILL CHANGE THESE)
@@ -89,12 +93,9 @@ fsurdat = '${CLM_SURFDAT_DIR}/${CLM_USRDAT_SURDAT}'
 fates_paramfile='${PARAM_FILES}/fates_params_default-1pft.nc'
 use_fates=.true.
 use_fates_planthydro=.false.
-use_fates_inventory_init = .true.
-fates_inventory_ctrl_filename = '/scratch/brussel/vo/000/bvo00003/vsc46573/cesm/inventory/fates_${SITE}_inventory_ctrl'
-fluh_timeseries=''
 hist_fincl1=
-'FATES_VEGC_PF', 'FATES_VEGC_ABOVEGROUND', 
-'FATES_NPLANT_SZ', 'FATES_CROWNAREA_PF', 
+'FATES_VEGC_PF', 'FATES_VEGC_ABOVEGROUND',
+'FATES_NPLANT_SZ', 'FATES_CROWNAREA_PF',
 'FATES_LAI', 'FATES_BASALAREA_SZPF', 'FATES_CA_WEIGHTED_HEIGHT', 'Z0MG',
 'FATES_MORTALITY_CSTARV_CFLUX_PF', 'FATES_MORTALITY_CFLUX_PF',
 'FATES_MORTALITY_HYDRO_CFLUX_PF', 'FATES_MORTALITY_BACKGROUND_SZPF',
@@ -104,24 +105,16 @@ hist_fincl1=
 'FATES_MORTALITY_USTORY_SZPF', 'FATES_NPLANT_SZPF',
 'FATES_NPLANT_CANOPY_SZPF', 'FATES_NPLANT_USTORY_SZPF',
 'FATES_NPP_PF', 'FATES_GPP_PF', 'FATES_NEP', 'FATES_FIRE_CLOSS',
-'FATES_ABOVEGROUND_PROD_SZPF', 'FATES_ABOVEGROUND_MORT_SZPF', 
-'FATES_NPLANT_CANOPY_SZ', 'FATES_NPLANT_USTORY_SZ', 
-'FATES_DDBH_CANOPY_SZ', 'FATES_DDBH_USTORY_SZ', 
+'FATES_ABOVEGROUND_PROD_SZPF', 'FATES_ABOVEGROUND_MORT_SZPF',
+'FATES_NPLANT_CANOPY_SZ', 'FATES_NPLANT_USTORY_SZ',
+'FATES_DDBH_CANOPY_SZ', 'FATES_DDBH_USTORY_SZ',
 'FATES_MORTALITY_CANOPY_SZ', 'FATES_MORTALITY_USTORY_SZ'
-EOF
-
-
-cat >> user_nl_datm <<EOF
-taxmode = "cycle", "cycle", "cycle"
 EOF
 
 # Setup case
 ./case.setup 
+cp ${SITE_BASE_DIR}/${SITE}/user_mods/user_nl_datm_streams  $VSC_SCRATCH/cesm/cases/${TAG}.`date +"%Y-%m-%d"`/
 ./preview_namelists
-
-# Make change to datm stream field info variable names (specific for this tutorial) - DO NOT CHANGE
-cp $VSC_SCRATCH/cesm/output/${TAG}.`date +"%Y-%m-%d"`/run/datm.streams.txt.CLM1PT.CLM_USRDAT user_datm.streams.txt.CLM1PT.CLM_USRDAT
-`sed -i '/FLDS/d' user_datm.streams.txt.CLM1PT.CLM_USRDAT` 
 
 # Build and submit the case
 ./case.build --skip-provenance-check # skipping provenance avoids calling git (for this tutorial only)
