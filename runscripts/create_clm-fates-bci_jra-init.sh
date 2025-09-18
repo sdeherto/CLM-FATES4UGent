@@ -48,7 +48,7 @@ cd ${CASE_NAME}
 ./xmlchange DIN_LOC_ROOT_CLMFORC=${DIN_LOC_ROOT_FORCE}
 ./xmlchange --force CLM_USRDAT_DIR=${CLM_SURFDAT_DIR}
 ./xmlchange --force PTS_LON=280.2
-./xmlchange --force PTS_LAT=8.95
+./xmlchange --force PTS_LAT=9.15
 ./xmlchange CLM_USRDAT_NAME=${SITE}
 
 # For constant CO2

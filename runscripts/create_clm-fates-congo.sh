@@ -14,7 +14,7 @@ export PARAM_FILES=$VSC_SCRATCH/cesm/params                    # FATES parameter
 
 # surface and mesh files
 export SITE_BASE_DIR=$VSC_SCRATCH/cesm/sitedata
-export CLM_USRDAT_SURDAT=surfdata_1.0-45.0_-25.0-25.0_hist_2000_16pfts_c250918.nc
+export CLM_USRDAT_SURDAT=surfdata_6.5-35.0_-19.0-10.25_hist_2000_16pfts_c250918.nc
 export CLM_USRDAT_MESH=domain.lnd.fv0.9x1.25_gx1v7_1.0-45.0_-25.0-25.0_c250918.nc
 export CLM_SURFDAT_DIR=${SITE_BASE_DIR}/${SITE}
 export CLM_MESH_DIR=${SITE_BASE_DIR}/${SITE}

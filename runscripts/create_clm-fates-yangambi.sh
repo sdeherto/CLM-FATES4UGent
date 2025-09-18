@@ -56,7 +56,7 @@ cd ${CASE_NAME}
 ./xmlchange LND_DOMAIN_FILE=${CLM_USRDAT_DOMAIN}
 ./xmlchange LND_DOMAIN_PATH=${CLM_DOMAIN_DIR}
 #./xmlchange DATM_MODE=1PT
-./xmlchange DIN_LOC_ROOT_CLMFORC=${DIN_LOC_ROOT_FORCE}
+#./xmlchange DIN_LOC_ROOT_CLMFORC=${DIN_LOC_ROOT_FORCE}
 ./xmlchange CLM_USRDAT_NAME=${SITE}
 
 # For constant CO2
@@ -113,7 +113,7 @@ EOF
 
 # Setup case
 ./case.setup 
-cp ${SITE_BASE_DIR}/${SITE}/user_mods/user_nl_datm_streams  $VSC_SCRATCH/cesm/cases/${TAG}.`date +"%Y-%m-%d"`/
+#cp ${SITE_BASE_DIR}/${SITE}/user_mods/user_nl_datm_streams  $VSC_SCRATCH/cesm/cases/${TAG}.`date +"%Y-%m-%d"`/
 ./preview_namelists
 
 # Build and submit the case
