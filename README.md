@@ -5,4 +5,4 @@ The clean, up-to-date version of the tutorial is hosted here:
 
 **[CLM-FATES Hydra Tutorial](https://EamonOCathain.github.io/CLM-FATES_Hydra_Tutorial/)**
 
-Materials aree based on FATES tutorial (https://github.com/NGEET/fates-tutorial/) and course material of Land Climate Dynamics (VUB).
+Materials are based on FATES tutorial (https://github.com/NGEET/fates-tutorial/) and course material of Land Climate Dynamics (VUB).
