@@ -5,6 +5,6 @@ This is a tutorial for running CLM and FATES on Flemish supercomputing systems h
 
 **[CLM-FATES Hydra Tutorial](https://EamonOCathain.github.io/CLM-FATES_Hydra_Tutorial/)**
 
-With the raw .md files used to create it found here: https://github.com/EamonOCathain/CLM-FATES_Hydra_Tutorial.
+With the raw .md files found here: https://github.com/EamonOCathain/CLM-FATES_Hydra_Tutorial.
 
 Materials are based on FATES tutorial (https://github.com/NGEET/fates-tutorial/) and course material of Land Climate Dynamics (VUB).
