@@ -8,3 +8,5 @@ This is a tutorial for running CLM and FATES on Flemish supercomputing systems h
 With the raw .md files found here: https://github.com/EamonOCathain/CLM-FATES_Hydra_Tutorial.
 
 Materials are based on FATES tutorial (https://github.com/NGEET/fates-tutorial/) and course material of Land Climate Dynamics (VUB).
+
+Also check out the most recent CESM tutorial held in NCAR which focusses on CESM3 (https://ncar.github.io/CESM-Tutorial/notebooks/basics/basics_overview.html).
